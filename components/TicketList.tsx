@@ -75,7 +75,7 @@ if(second==0){
         }
 
       }
-    }, 5000); // Check every 5 second
+    }, 15000); // Check every 5 second
 
     return () => clearInterval(interval);
   }, [startTime, numbers, gameFinished,router]);
