@@ -121,7 +121,7 @@ const Ticket = () => {
 
 
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-28">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-52">
                 {tickets.map((ticketData, index) => (
                     <div key={index} className="bg-green-200 shadow-lg rounded-lg p-4 border-2 border-white">
                         <h2 className="text-center font-bold mb-2">T-{index + 1}</h2>
