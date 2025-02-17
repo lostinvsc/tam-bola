@@ -4,9 +4,8 @@ import TambolaTicket from "@/models/TambolaTicket";
 
 // Define the Ticket type
 interface Ticket {
-  _id?: string; // Optional because it's not provided when inserting a new ticket
   name: string;
-  pattern: string;
+  ticket: number[][];
 }
 
 // Connect to MongoDB (Ensure this runs once)

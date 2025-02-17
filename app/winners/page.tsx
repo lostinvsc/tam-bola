@@ -6,7 +6,7 @@ import Link from "next/link";
 interface Pattern {
     _id: string;
     pattern: string;
-    name: string[];
+    winners: string[];
   }
 const WinnersDisplay = () => {
     // State to store patterns data
@@ -87,7 +87,7 @@ const WinnersDisplay = () => {
                         >
                             <h2 className="text-xl font-bold text-gray-800 mb-4">=) {patternData.pattern}</h2>
                             <div className="space-y-2">
-                                {patternData.name.map((name: string, index: number) => (
+                                {patternData.winners.map((name: string, index: number) => (
                                     <p key={index} className="text-gray-600 text-lg pl-6">
                                         <span className="text-sm">{index + 1}- </span>
                                         {name}

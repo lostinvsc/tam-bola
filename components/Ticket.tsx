@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 import { ToastContainer } from "react-toastify";
 const generateTambolaTicket = () => {
 
-    const ticket: (number | null)[][] = Array.from({ length: 3 }, () => Array(9).fill(null));
+    const ticket: (number | null)[][] = Array.from({ length: 3 }, () => Array(9).fill(0));
     const columns: { [key: number]: number[] } = {};
 
     for (let col = 0; col < 9; col++) {

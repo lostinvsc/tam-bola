@@ -14,30 +14,37 @@ const connectDB = async () => {
 interface TicketHolder {
     name: string;
     ticket: number[][];
-  }
-  
+}
 
-  const checkTambolaWinners = (ticketHolders: TicketHolder[], drawnNumbers: number[]) => {
+interface WinnerResult {
+    pattern: string;
+    winners: string[];
+  }
+
+  type WinnerArray = WinnerResult[];
+
+
+const checkTambolaWinners = (ticketHolders: TicketHolder[], drawnNumbers: number[]) => {
     const drawnSet = new Set(drawnNumbers);
     const results: { pattern: string; winners: string[] }[] = [];
-  
+
     const patterns = {
-      "Top Line": (ticket: number[][]) => ticket[0].every(num => drawnSet.has(num)),
-      "Centre Line": (ticket: number[][]) => ticket[1].every(num => drawnSet.has(num)),
-      "Bottom Line": (ticket: number[][]) => ticket[2].every(num => drawnSet.has(num)),
-      "Quick Seven": (ticket: number[][]) => ticket.flat().filter(num => drawnSet.has(num)).length >= 7,
-      "Full House": (ticket: number[][]) => ticket.flat().every(num => drawnSet.has(num)),
-    //   "Second Full House": (ticket: number[][]) => ticket.flat().every(num => drawnSet.has(num)) // Same as Full House
+        "Top Line": (ticket: number[][]) => ticket[0].every(num => drawnSet.has(num)),
+        "Centre Line": (ticket: number[][]) => ticket[1].every(num => drawnSet.has(num)),
+        "Bottom Line": (ticket: number[][]) => ticket[2].every(num => drawnSet.has(num)),
+        "Quick Seven": (ticket: number[][]) => ticket.flat().filter(num => drawnSet.has(num)).length >= 19,
+        "Full House": (ticket: number[][]) => ticket.flat().every(num => drawnSet.has(num)),
+        //   "Second Full House": (ticket: number[][]) => ticket.flat().every(num => drawnSet.has(num)) // Same as Full House
     };
-  
+
     for (const [pattern, checkFn] of Object.entries(patterns)) {
-      const winners = ticketHolders.filter(({ ticket }) => checkFn(ticket)).map(({ name }) => name);
-      if (winners.length) results.push({ pattern, winners });
+        const winners = ticketHolders.filter(({ ticket }) => checkFn(ticket)).map(({ name }) => name);
+        if (winners.length) results.push({ pattern, winners });
     }
-  
+
     return results;
-  };
-  
+};
+
 
 
 export async function POST(req: NextRequest) {
@@ -52,64 +59,73 @@ export async function POST(req: NextRequest) {
             [numbers[i], numbers[j]] = [numbers[j], numbers[i]];
         }
 
-        
-
-        interface PatternData {
-            pattern: string;  
-            name: string[];  
-          }
-          
-          const finalArray: PatternData[] = [];
-          
-          function addToFinalArray(pattern: string, names: string[]): void {
-            const exists = finalArray.find(item => item.pattern === pattern);
-          
-            if (!exists) {
-              finalArray.push({ pattern, name: names });
-              // console.log("Added successfully:", { pattern, name: names });
-            } else {
-              // console.log(`Pattern "${pattern}" already exists!`);
-            }
-          }
-
-  
         await DrawnNumbers.deleteMany({});
         await Winners.deleteMany({});
         await DrawnNumbers.create({ numbers, createdAt: Date.now() + 5000, time });
-        const tickets = await TambolaTicket.find({}).lean(); 
+        const tickets = await TambolaTicket.find({}).lean();
 
         const formattedTickets = tickets.map(t => ({
             name: t.name,
-            ticket: t.ticket 
+            ticket: t.ticket
         }));
 
-        // let drawnNumbers: number[] = [];
-        // let currentIndex = 0;
-// console.log(formattedTickets)
+
+
+
+        const ff: WinnerArray = [];
+
 
         for (let i = 4; i <= 90; i++) {
-           const drawnNumbers=numbers.slice(0,i);
-           const result = checkTambolaWinners(formattedTickets, drawnNumbers);
-        //    console.log(result);
-           if (result && result[0] && result[0].pattern) {
-            addToFinalArray(result[0].pattern,result[0].winners)
-        } 
-          
+            const drawnNumbers = numbers.slice(0, i);
+
+            drawnNumbers.push(0);
+
+            const result = checkTambolaWinners(formattedTickets, drawnNumbers);
+
+            //    console.log(result);
+
+
+            if (result && result[0] && result[0].pattern) {
+                for (let k = 0; k < result.length; k++) {
+                    ff.push(result[k])
+                }
+            }
+
+        }
+        const finalArray: WinnerArray = [];
+        let qs = false;
+        let tl = false;
+        let cl = false;
+        let bl = false;
+        let fh = false;
+
+        for (let k = 0; k < ff.length; k++) {
+            if (ff[k].pattern == "Quick Seven" && !qs) {
+                qs = true;
+                finalArray.push(ff[k]);
+            }
+            if (ff[k].pattern == "Top Line" && !tl) {
+                tl = true;
+                finalArray.push(ff[k]);
+            }
+            if (ff[k].pattern == "Centre Line" && !cl) {
+                cl = true;
+                finalArray.push(ff[k]);
+            }
+            if (ff[k].pattern == "Bottom Line" && !bl) {
+                bl = true;
+                finalArray.push(ff[k]);
+            }
+            if (ff[k].pattern == "Full House" && !fh) {
+                fh = true;
+                finalArray.push(ff[k]);
+            }
+
         }
 
-        console.log(finalArray)
-
-          await Winners.create(finalArray);
         
 
-// const ticketHolders = [
-//     { name: "Alice", ticket: [[5, 18, 30,90,89], [11, 22, 35,87,86], [14, 25, 40,54,53]] },
-//     { name: "Bob", ticket: [[1, 2, 3,10,11], [4, 5, 6,12,13], [7, 8, 9,14,15]] },
-//   ];
-  
-//   const drawnNumbers = [5, 18, 30,90,89,4,5,6,8,11,12,13,22,35]; 
-  
-//   console.log(checkTambolaWinners(ticketHolders, drawnNumbers));
+          await Winners.insertMany(finalArray);
 
 
         return NextResponse.json({ message: "Game started" }, { status: 200 });

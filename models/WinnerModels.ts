@@ -3,7 +3,7 @@ import mongoose, { Document, Schema, Model } from 'mongoose';
 // Define the interface for the Winner document
 interface IWinner extends Document {
   pattern: string;
-  name: string[];
+  winners: string[];
 }
 
 // Define the schema for storing patterns and associated names
@@ -14,7 +14,7 @@ const WinnersSchema: Schema<IWinner> = new Schema(
       required: true,
       unique: true,  // Ensure that each pattern is unique
     },
-    name: {
+    winners: {
       type: [String],  // An array to store names of players who won with the pattern
       default: [],  // Default to an empty array
     },
