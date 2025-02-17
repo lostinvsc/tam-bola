@@ -89,7 +89,8 @@ export async function POST(req: NextRequest) {
         }));
 
         // let drawnNumbers: number[] = [];
-        let currentIndex = 0;
+        // let currentIndex = 0;
+// console.log(formattedTickets)
 
         for (let i = 4; i <= 90; i++) {
            const drawnNumbers=numbers.slice(0,i);
@@ -101,7 +102,7 @@ export async function POST(req: NextRequest) {
           
         }
 
-        // console.log(finalArray)
+        console.log(finalArray)
 
           await Winners.create(finalArray);
         
