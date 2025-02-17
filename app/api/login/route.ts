@@ -7,7 +7,6 @@ export async function POST(req: Request) {
 
     const adminU = process.env.ADMIN_U;
     const adminP = process.env.ADMIN_P;
-    const secretKey = process.env.SECRET_KEY || "default-secret-key";
 
     // Check username & password
     if (adminU === username && adminP === password) {
