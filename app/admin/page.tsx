@@ -20,7 +20,7 @@ const Page = () => {
       }
     
     
-  }, []);
+  }, [router]);
 
   return (
     <div className="bg-green-300">

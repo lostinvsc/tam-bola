@@ -15,7 +15,7 @@ const Login = () => {
       if(localStorage.getItem("adminToken")){
         router.push("/admin")
       }
-    }, [])
+    }, [router])
     
 
 

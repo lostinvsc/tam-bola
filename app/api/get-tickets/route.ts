@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import {  NextResponse } from "next/server";
 import mongoose from "mongoose";
 import TambolaTicket from "@/models/TambolaTicket";
 
@@ -8,7 +8,7 @@ const connectDB = async () => {
   await mongoose.connect(process.env.MONGO_URI as string);
 };
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     await connectDB();
 

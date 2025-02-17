@@ -42,7 +42,7 @@ const TicketsList = () => {
 
     fetchNumbers();
 
-  }, [statec]);
+  }, [statec,router]);
 
   const [second, setsecond] = useState(0)
   useEffect(() => {
@@ -78,7 +78,7 @@ if(second==0){
     }, 5000); // Check every 5 second
 
     return () => clearInterval(interval);
-  }, [startTime, numbers, gameFinished]);
+  }, [startTime, numbers, gameFinished,router]);
 
   useEffect(() => {
     const fetchTickets = async () => {
@@ -100,7 +100,7 @@ if(second==0){
     };
 
     fetchTickets();
-  }, [statec]);
+  }, [statec,router]);
 
 
   useEffect(() => {
@@ -127,7 +127,7 @@ if(second==0){
     const interval = setInterval(checkAndRefresh, timei * 1000);
 
     return () => clearInterval(interval);
-  }, [startTime]);
+  }, [startTime,router]);
 
 
   if (loading) return <p className="text-center text-xl font-bold">Loading...</p>;

@@ -16,11 +16,6 @@ interface TicketHolder {
     ticket: number[][];
   }
   
-  interface WinningResult {
-    pattern: string;
-    winners: string[];
-  }
-  
 
   const checkTambolaWinners = (ticketHolders: TicketHolder[], drawnNumbers: number[]) => {
     const drawnSet = new Set(drawnNumbers);
@@ -64,7 +59,7 @@ export async function POST(req: NextRequest) {
             name: string[];  
           }
           
-          let finalArray: PatternData[] = [];
+          const finalArray: PatternData[] = [];
           
           function addToFinalArray(pattern: string, names: string[]): void {
             const exists = finalArray.find(item => item.pattern === pattern);
@@ -94,7 +89,7 @@ export async function POST(req: NextRequest) {
 
         for (let i = 4; i <= 90; i++) {
            const drawnNumbers=numbers.slice(0,i);
-           let result = checkTambolaWinners(formattedTickets, drawnNumbers);
+           const result = checkTambolaWinners(formattedTickets, drawnNumbers);
         //    console.log(result);
            if (result && result[0] && result[0].pattern) {
             addToFinalArray(result[0].pattern,result[0].winners)

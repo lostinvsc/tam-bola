@@ -13,24 +13,24 @@ const generateTambolaTicket = () => {
     const columns: { [key: number]: number[] } = {};
 
     for (let col = 0; col < 9; col++) {
-        let min = col * 10 + 1;
-        let max = col === 8 ? 90 : min + 9;
+        const min = col * 10 + 1;
+        const max = col === 8 ? 90 : min + 9;
         columns[col] = Array.from({ length: 10 }, (_, i) => min + i);
     }
 
     for (let row = 0; row < 3; row++) {
-        let placedCols = new Set<number>();
+        const placedCols = new Set<number>();
 
         while (placedCols.size < 5) {
-            let col = Math.floor(Math.random() * 9);
+            const col = Math.floor(Math.random() * 9);
             if (placedCols.has(col)) continue;
 
-            let availableNumbers = columns[col].filter((num) =>
+            const availableNumbers = columns[col].filter((num) =>
                 ticket.every((r) => !r.includes(num))
             );
             if (availableNumbers.length === 0) continue;
 
-            let num = availableNumbers[Math.floor(Math.random() * availableNumbers.length)];
+            const num = availableNumbers[Math.floor(Math.random() * availableNumbers.length)];
             ticket[row][col] = num;
             placedCols.add(col);
         }
@@ -42,7 +42,7 @@ const generateTambolaTicket = () => {
 const Ticket = () => {
     const router = useRouter();
     const [tickets, setTickets] = useState<{ name: string; ticket: (number | null)[][] }[]>([]);
-    const [first, setfirst] = useState(false);
+    
     useEffect(() => {
         const storedData = localStorage.getItem("tambolaTickets");
         if (storedData) {
@@ -50,10 +50,10 @@ const Ticket = () => {
         } else {
             generateAndSaveTickets();
         }
-    }, []);
+    }, [router]);
 
     const generateAndSaveTickets = () => {
-        // setfirst(true);
+        
         const newTickets = Array.from({ length: 100 }, () => ({
             name: "",
             ticket: generateTambolaTicket(),
