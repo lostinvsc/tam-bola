@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Ticket from "@/components/Ticket";
 import { useRouter } from "next/navigation";
 import { ToastContainer } from "react-toastify";
@@ -23,10 +23,10 @@ const Page = () => {
   }, []);
 
   return (
-    <>
+    <div className="bg-green-300">
       <Ticket />
       <ToastContainer />
-    </>
+    </div>
   );
 };
 

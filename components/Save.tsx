@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import axios from "axios";
 import { toast } from "react-toastify";
 const SaveButton = () => {
   const [loading, setLoading] = useState(false);
@@ -54,7 +53,7 @@ const SaveButton = () => {
   return (
     <button
       onClick={handleSaveToMongoDB}
-      className="px-6 py-2 font-semibold rounded-lg hover:scale-[1.07] transition border-2 bg-white border-black"
+      className="px-6 py-2 bg-green-700 text-white font-semibold rounded-lg hover:scale-[1.07] transition border-2 border-black"
       disabled={loading}
     >
       {loading ? "Saving..." : "Save"}

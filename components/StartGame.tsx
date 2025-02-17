@@ -16,6 +16,7 @@ export default function StartButton() {
         time:duration
       }
       const response = await axios.post(`/api/draw-numbers`, data);
+      console.log(response)
       if (response.data.start==false) {
         toast.error(response.data.message, {
           position: "top-right",
@@ -38,7 +39,7 @@ export default function StartButton() {
     <>
       <button
         onClick={() => setShowPopup(true)}
-        className="px-6 py-2 font-semibold rounded-lg hover:scale-[1.07] transition border-2 bg-white border-black"
+        className="px-6 py-2 font-semibold rounded-lg hover:scale-[1.07] transition border-2 bg-green-700 text-white border-black"
         disabled={loading}
       >
         {loading ? "Starting..." : "Start"}

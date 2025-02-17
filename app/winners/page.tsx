@@ -1,101 +1,99 @@
-"use client"
-import { useEffect, useState } from "react";
+"use client";
 
-type Winner = {
-  name: string;
-  ticket: (number | null)[][];
-  drawnNumbers: number[];
-  patterns: string[];
-  createdAt: string;
-};
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import Link from "next/link";
+const WinnersDisplay = () => {
+    // State to store patterns data
+    const [patterns, setPatterns] = useState<any[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
 
-const WinnersList = () => {
-  const [groupedWinners, setGroupedWinners] = useState<Record<string, Winner[]>>({});
-  const [selectedWinner, setSelectedWinner] = useState<Winner | null>(null);
-
-  useEffect(() => {
-    const fetchWinners = async () => {
-      try {
-        const response = await fetch("/api/get-winners");
-        const data = await response.json();
-
-        // Group winners by pattern
-        const grouped: Record<string, Winner[]> = {};
-        data.winners.forEach((winner: Winner) => {
-          winner.patterns.forEach((pattern) => {
-            if (!grouped[pattern]) {
-              grouped[pattern] = [];
+    // Fetch patterns from the backend API
+    useEffect(() => {
+        const fetchPatterns = async () => {
+            try {
+                const response = await axios.get("/api/get-winners");
+                setPatterns(response.data.patterns);
+                setLoading(false);
+            } catch (err) {
+                setError("Error fetching data");
+                setLoading(false);
             }
-            grouped[pattern].push(winner);
-          });
-        });
-        setGroupedWinners(grouped);
-      } catch (error) {
-        console.error("Error fetching winners:", error);
-      }
-    };
+        };
 
-    fetchWinners();
-  }, []);
+        fetchPatterns();
+    }, []); // Empty dependency array means this runs once after the component mounts
 
-  return (
-    <div className="p-6 bg-gray-100 min-h-screen">
-      <h2 className="text-2xl font-bold text-gray-800 mb-4">Winners</h2>
-      {Object.keys(groupedWinners).length === 0 ? (
-        <p className="text-gray-600">No winners yet.</p>
-      ) : (
-        Object.entries(groupedWinners).map(([pattern, winners]) => (
-          <div key={pattern} className="bg-white p-4 rounded-lg shadow-md mb-4">
-            <h3 className="text-xl font-semibold text-blue-600">{pattern}</h3>
-            <ul className="mt-2">
-              {winners.map((winner, index) => (
-                <li key={index} className="border-b py-2 flex justify-between items-center">
-                  <span className="font-medium text-gray-800">{index + 1}. {winner.name}</span>
-                  <button
-                    className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-                    onClick={() => setSelectedWinner(winner)}
-                  >
-                    View Ticket
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))
-      )}
-
-      {/* Ticket Popup */}
-      {selectedWinner && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white py-4 px-2 rounded-lg shadow-lg relative">
-            <button
-              className="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
-              onClick={() => setSelectedWinner(null)}
-            >
-              ✖
-            </button>
-            <h2 className="text-xl font-bold text-gray-800 mb-3">{selectedWinner.name}'s Ticket</h2>
-            <div className="grid grid-cols-9 gap-2">
-              {selectedWinner.ticket.flat().map((num, idx) => (
-                <div
-                  key={idx}
-                  className={`w-9 h-9 flex justify-center items-center text-lg font-semibold rounded ${
-                    num === null
-                      ? "bg-gray-300"
-                      : selectedWinner.drawnNumbers.includes(num)
-                      ? "bg-red-500 text-white"
-                      : "bg-yellow-500 text-black"
-                  }`}
-                >
-                  {num ?? ""}
-                </div>
-              ))}
+    // Render loading state or error message
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <div className="text-xl">Loading...</div>
             </div>
-          </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <div className="text-xl text-red-600">{error}</div>
+            </div>
+        );
+    }
+
+    return (
+        <div className=" bg-green-300 w-[100vw] h-[100vh]">
+            <nav className="shadow-lg w-full p-4 top-0 bg-green-300">
+                <div className="container mx-auto flex flex-wrap justify-center md:justify-between items-center gap-3 ">
+
+                    <Link href="/">
+                        <button className="px-6 py-2 font-semibold rounded-lg hover:scale-[1.07] transition border-2 border-black bg-green-700 text-white">
+                            Home
+                        </button>
+                    </Link>
+                    {/* Call Agent Button */}
+                    <a href="tel:+919366794921">
+                        <button className="px-6 py-2 font-semibold rounded-lg hover:scale-[1.07] transition border-2 border-black bg-green-700 text-white">
+                            Call agent
+                        </button>
+                    </a>
+
+                    {/* WhatsApp Button */}
+                    <a href="https://wa.me/916009936047" target="_blank" rel="noopener noreferrer">
+                        <button className="px-6 py-2 font-semibold rounded-lg hover:scale-[1.07] transition border-2 border-black bg-green-700 text-white">
+                            WhatsApp
+                        </button>
+                    </a>
+
+                </div>
+            </nav>
+            {patterns.length === 0 ? (
+                <div className="flex justify-center items-center text-xl text-gray-600">
+                    No winners found.
+                </div>
+            ) : (
+                <div className=" flex flex-col bg-green-200">
+                    {patterns.map((patternData) => (
+                        <div
+                            key={patternData._id}
+                            className="bg-green-200 p-6 rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300 mt-5"
+                        >
+                            <h2 className="text-xl font-bold text-gray-800 mb-4">=) {patternData.pattern}</h2>
+                            <div className="space-y-2">
+                                {patternData.name.map((name: string, index: number) => (
+                                    <p key={index} className="text-gray-600 text-lg pl-4">
+                                        <span className="text-sm">{index + 1}- </span>
+                                        {name}
+                                    </p>
+                                ))}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
         </div>
-      )}
-    </div>
-  );
+    );
 };
 
-export default WinnersList;
+export default WinnersDisplay;

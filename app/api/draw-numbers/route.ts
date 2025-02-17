@@ -1,9 +1,8 @@
 import DrawnNumbers from "@/models/DrawnNumber";
 import { NextRequest, NextResponse } from "next/server";
 import TambolaTicket from "@/models/TambolaTicket";
-import WinnerModels from "@/models/WinnerModels";
+import Winners from "@/models/WinnerModels";
 import mongoose from "mongoose";
-
 
 // Connect to MongoDB
 const connectDB = async () => {
@@ -11,82 +10,116 @@ const connectDB = async () => {
     await mongoose.connect(process.env.MONGO_URI as string);
 };
 
-// Function to check winning patterns based on numbers drawn so far
-const checkWinningPatterns = (ticket: number[][], drawnNumbers: number[]) => {
-    const patterns: string[] = [];
 
-    if (ticket[0].every((num) => drawnNumbers.includes(num))) patterns.push("Top Line");
-    if (ticket[1].every((num) => drawnNumbers.includes(num))) patterns.push("Center Line");
-    if (ticket[2].every((num) => drawnNumbers.includes(num))) patterns.push("Bottom Line");
+interface TicketHolder {
+    name: string;
+    ticket: number[][];
+  }
+  
+  interface WinningResult {
+    pattern: string;
+    winners: string[];
+  }
+  
 
-    let markedCount = ticket.flat().filter((num) => drawnNumbers.includes(num)).length;
-    if (markedCount >= 7) patterns.push("Quick Seven");
+  const checkTambolaWinners = (ticketHolders: TicketHolder[], drawnNumbers: number[]) => {
+    const drawnSet = new Set(drawnNumbers);
+    const results: { pattern: string; winners: string[] }[] = [];
+  
+    const patterns = {
+      "Top Line": (ticket: number[][]) => ticket[0].every(num => drawnSet.has(num)),
+      "Centre Line": (ticket: number[][]) => ticket[1].every(num => drawnSet.has(num)),
+      "Bottom Line": (ticket: number[][]) => ticket[2].every(num => drawnSet.has(num)),
+      "Quick Seven": (ticket: number[][]) => ticket.flat().filter(num => drawnSet.has(num)).length >= 7,
+      "Full House": (ticket: number[][]) => ticket.flat().every(num => drawnSet.has(num)),
+    //   "Second Full House": (ticket: number[][]) => ticket.flat().every(num => drawnSet.has(num)) // Same as Full House
+    };
+  
+    for (const [pattern, checkFn] of Object.entries(patterns)) {
+      const winners = ticketHolders.filter(({ ticket }) => checkFn(ticket)).map(({ name }) => name);
+      if (winners.length) results.push({ pattern, winners });
+    }
+  
+    return results;
+  };
+  
 
-    if (ticket.flat().every((num) => drawnNumbers.includes(num))) patterns.push("Full House");
-
-    return patterns;
-};
 
 export async function POST(req: NextRequest) {
     try {
         await connectDB();
-        const {time} = await req.json();
-      
-        // Generate a shuffled array of numbers from 1 to 90
+        const { time } = await req.json();
+
+        // Shuffle numbers from 1 to 90
         const numbers: number[] = Array.from({ length: 90 }, (_, i) => i + 1);
         for (let i = numbers.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [numbers[i], numbers[j]] = [numbers[j], numbers[i]];
         }
 
-        await DrawnNumbers.deleteMany({});
-        const numberSave = await DrawnNumbers.create({ numbers:numbers, createdAt:Date.now() + 5000 , time:time});
+        
 
-
-        // Fetch all tickets
-        const tickets = await TambolaTicket.find();
-        if (!tickets.length) return NextResponse.json({ message: "No tickets found" }, { status: 404 });
-
-        // Keep track of winners
-        const winners = [];
-
-        for (let i = 0; i < numbers.length; i++) {
-            const drawnNumbers = numbers.slice(0, i + 1); // Only consider numbers drawn so far
-
-            for (const ticket of tickets) {
-                const winningPatterns = checkWinningPatterns(ticket.ticket, drawnNumbers);
-
-                if (winningPatterns.length > 0) {
-                    // Save winners with drawn numbers so far
-                    const winnerData = {
-                        name: ticket.name,
-                        ticket: ticket.ticket,
-                        drawnNumbers, // Numbers drawn so far at this point
-                        patterns: winningPatterns,
-                    };
-
-                    // Prevent duplicate saving (only save if not already recorded)
-                    const existingWinner = await WinnerModels.findOne({
-                        name: ticket.name,
-                        patterns: { $in: winningPatterns },
-                    });
-
-                    if (!existingWinner) {
-                        await WinnerModels.create(winnerData);
-                        winners.push(winnerData);
-                    }
-                }
+        interface PatternData {
+            pattern: string;  
+            name: string[];  
+          }
+          
+          let finalArray: PatternData[] = [];
+          
+          function addToFinalArray(pattern: string, names: string[]): void {
+            const exists = finalArray.find(item => item.pattern === pattern);
+          
+            if (!exists) {
+              finalArray.push({ pattern, name: names });
+              // console.log("Added successfully:", { pattern, name: names });
+            } else {
+              // console.log(`Pattern "${pattern}" already exists!`);
             }
+          }
+
+  
+        await DrawnNumbers.deleteMany({});
+        await Winners.deleteMany({});
+        await DrawnNumbers.create({ numbers, createdAt: Date.now() + 5000, time });
+        const tickets = await TambolaTicket.find({}).lean(); 
+
+        const formattedTickets = tickets.map(t => ({
+            name: t.name,
+            ticket: t.ticket 
+        }));
+
+        // let drawnNumbers: number[] = [];
+        let currentIndex = 0;
+
+        for (let i = 4; i <= 90; i++) {
+           const drawnNumbers=numbers.slice(0,i);
+           let result = checkTambolaWinners(formattedTickets, drawnNumbers);
+        //    console.log(result);
+           if (result && result[0] && result[0].pattern) {
+            addToFinalArray(result[0].pattern,result[0].winners)
+        } 
+          
         }
 
-        if (numberSave) {
-            return NextResponse.json({ message: "Game starting soon",winners }, { status: 200 });
-        }
+        // console.log(finalArray)
 
-        return NextResponse.json({ message: "Error starting the game" }, { status: 400 });
+          await Winners.create(finalArray);
+        
+
+// const ticketHolders = [
+//     { name: "Alice", ticket: [[5, 18, 30,90,89], [11, 22, 35,87,86], [14, 25, 40,54,53]] },
+//     { name: "Bob", ticket: [[1, 2, 3,10,11], [4, 5, 6,12,13], [7, 8, 9,14,15]] },
+//   ];
+  
+//   const drawnNumbers = [5, 18, 30,90,89,4,5,6,8,11,12,13,22,35]; 
+  
+//   console.log(checkTambolaWinners(ticketHolders, drawnNumbers));
+
+
+        return NextResponse.json({ message: "Game started" }, { status: 200 });
 
     } catch (error) {
-        console.error("Error fetching drawn numbers:", error);
+        console.error("Error processing game start:", error);
         return NextResponse.json({ error: "Server error" }, { status: 500 });
     }
 }

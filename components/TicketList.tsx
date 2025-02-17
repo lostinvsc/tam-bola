@@ -1,10 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import axios from "axios"
-import Link from "next/link";
 import moment from "moment";
 import { toast } from "react-toastify";
-import { setTimeout } from "timers/promises";
 import Navbar from "./Navbar";
 import { useRouter } from "next/navigation";
 interface Ticket {
@@ -135,7 +133,7 @@ if(second==0){
   if (loading) return <p className="text-center text-xl font-bold">Loading...</p>;
 
   return (
-    <div className=" mx-auto w-full min-h-screen">
+    <div className=" mx-auto w-full min-h-screen pb-9">
 
 
       <Navbar />
@@ -146,11 +144,11 @@ if(second==0){
 
 
 
-          <h1 className="mx-auto w-fit text-xl font-bold mt-10">
+          <h1 className="mx-auto w-fit text-xl font-bold mt-28">
             Wait for new game to begin. . .
           </h1>
           :
-          <div className="flex flex-col items-center justify-center mb-8">
+          <div className="flex flex-col items-center justify-center mb-8 mt-14">
             <h1 className="text-3xl font-bold mb-4">
               {
                 gameFinished ? "Game Finished"
@@ -192,10 +190,10 @@ if(second==0){
         moment().diff(startTime, "seconds") <= (timei) * 90 + 120 &&
 
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-24 pt-5">
+        <div className="flex flex-wrap w-full gap-6 pt-5 justify-center">
           {tickets.length > 0 && (
             tickets.map((ticketData, index) => (
-              <div key={index} className="bg-white shadow-lg rounded-lg p-4 border-2 border-gray-200">
+              <div key={index} className="bg-green-200 shadow-lg rounded-lg p-4 border-2 border-white max-w-[95vw]">
                 <h2 className="text-center font-bold mb-2">T-{index + 1}</h2>
 
                 {ticketData.ticket.map((row, rowIndex) => (
@@ -207,7 +205,7 @@ if(second==0){
                       return (
                         <div
                           key={colIndex}
-                          className="w-12 h-12 flex items-center justify-center border m-1 rounded-md text-lg font-semibold"
+                          className="w-12 h-12 flex items-center justify-center border border-white m-1 rounded-md text-lg font-semibold"
                           style={{
                             backgroundColor: isDrawn ? "#ff0000" : "#ffeb3b",
                             color: isDrawn ? "#ffffff" : "#000000",
@@ -219,7 +217,7 @@ if(second==0){
                     })}
                   </div>
                 ))}
-                <div className="w-full mb-2 p-2 border rounded-lg text-center mt-10">
+                <div className="w-full mb-2 p-2 border border-white rounded-lg text-center mt-10">
                   {ticketData.name ? ticketData.name : "No name"}
                 </div>
               </div>

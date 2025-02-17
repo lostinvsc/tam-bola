@@ -91,18 +91,18 @@ const Ticket = () => {
 
     return (
         <div className="flex flex-col items-center">
-            <nav className="shadow-lg w-full mb-16 flex justify-between items-center px-4 py-3">
+            <nav className="shadow-lg w-full mb-16 flex justify-between items-center px-4 py-3 fixed top-0 bg-green-300">
     <div className="w-full flex justify-center items-center gap-4 flex-wrap">
         {/* Navigation Buttons */}
         <Link href="/">
-            <button className="px-6 py-2 font-semibold rounded-lg hover:scale-[1.07] transition border-2 border-black">
+            <button className="px-6 py-2 bg-green-700 text-white font-semibold rounded-lg hover:scale-[1.07] transition border-2 border-black">
                 Home
             </button>
         </Link>
 
         <button
             onClick={generateAndSaveTickets}
-            className="px-6 py-2 font-semibold rounded-lg hover:scale-[1.07] transition border-2 border-black"
+            className="px-6 py-2 font-semibold rounded-lg hover:scale-[1.07] transition border-2 border-black bg-green-700 text-white"
         >
             Generate 100 Tickets
         </button>
@@ -122,9 +122,9 @@ const Ticket = () => {
 
 
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-28">
                 {tickets.map((ticketData, index) => (
-                    <div key={index} className="bg-white shadow-lg rounded-lg p-4 border-2 border-gray-200">
+                    <div key={index} className="bg-green-200 shadow-lg rounded-lg p-4 border-2 border-white">
                         <h2 className="text-center font-bold mb-2">T-{index + 1}</h2>
 
                         {ticketData.ticket.map((row, rowIndex) => (
@@ -132,7 +132,7 @@ const Ticket = () => {
                                 {row.map((num, colIndex) => (
                                     <div
                                         key={colIndex}
-                                        className="w-12 h-12 flex items-center justify-center border m-1 rounded-md text-lg font-semibold"
+                                        className="w-12 h-12 flex items-center justify-center border border-white m-1 rounded-md text-lg font-semibold"
                                         style={{ backgroundColor: num ? "#ffeb3b" : "transparent" }}
                                     >
                                         {num || ""}
