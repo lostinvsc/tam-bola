@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
 import TambolaTicket from "@/models/TambolaTicket";
 
+// Define the Ticket type
+interface Ticket {
+  _id?: string; // Optional because it's not provided when inserting a new ticket
+  name: string;
+  pattern: string;
+}
+
 // Connect to MongoDB (Ensure this runs once)
 const connectDB = async () => {
   if (mongoose.connection.readyState === 1) return;
@@ -12,7 +19,8 @@ export async function POST(req: NextRequest) {
   try {
     await connectDB();
     
-    const { tickets } = await req.json();
+    // Destructure tickets from the request body and type it
+    const { tickets }: { tickets: Ticket[] } = await req.json();
 
     if (!tickets || tickets.length === 0) {
       return NextResponse.json({ error: "No tickets provided" }, { status: 400 });
@@ -29,7 +37,6 @@ export async function POST(req: NextRequest) {
     await TambolaTicket.deleteMany({});
 
     // Insert only valid tickets
-    
     await TambolaTicket.insertMany(validTickets);
 
     return NextResponse.json({ message: "Tickets Saved Successfully!" });
@@ -38,4 +45,3 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
-

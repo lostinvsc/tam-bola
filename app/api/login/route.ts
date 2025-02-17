@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+
 
 export async function POST(req: Request) {
   try {
@@ -12,7 +12,7 @@ export async function POST(req: Request) {
     // Check username & password
     if (adminU === username && adminP === password) {
       // Generate JWT Token
-      const token = jwt.sign({ username }, secretKey, { expiresIn: "100h" });
+      const token = "tambolawithme"
 
       return NextResponse.json({ message: "Valid credentials",token }, { status: 200 });
     }
