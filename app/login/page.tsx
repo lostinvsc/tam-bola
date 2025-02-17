@@ -45,6 +45,7 @@ const Login = () => {
             }
 
         } catch (err) {
+            console.log(err)
             setError("Invalid credentials.");
         } finally {
             setLoading(false);

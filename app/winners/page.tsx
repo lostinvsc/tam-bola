@@ -3,9 +3,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Link from "next/link";
+interface Pattern {
+    _id: string;
+    pattern: string;
+    name: string[];
+  }
 const WinnersDisplay = () => {
     // State to store patterns data
-    const [patterns, setPatterns] = useState<any[]>([]);
+    const [patterns, setPatterns] = useState<Pattern[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -17,6 +22,7 @@ const WinnersDisplay = () => {
                 setPatterns(response.data.patterns);
                 setLoading(false);
             } catch (err) {
+                console.log(err);
                 setError("Error fetching data");
                 setLoading(false);
             }
@@ -82,7 +88,7 @@ const WinnersDisplay = () => {
                             <h2 className="text-xl font-bold text-gray-800 mb-4">=) {patternData.pattern}</h2>
                             <div className="space-y-2">
                                 {patternData.name.map((name: string, index: number) => (
-                                    <p key={index} className="text-gray-600 text-lg pl-4">
+                                    <p key={index} className="text-gray-600 text-lg pl-6">
                                         <span className="text-sm">{index + 1}- </span>
                                         {name}
                                     </p>

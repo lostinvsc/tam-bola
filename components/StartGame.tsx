@@ -5,7 +5,7 @@ import axios from "axios"
 export default function StartButton() {
   const [loading, setLoading] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
-  const [duration, setDuration] = useState(3); // Default value
+  const [duration, setDuration] = useState(3); 
 
   const handleStartGame = async () => {
     setLoading(true);
@@ -49,7 +49,7 @@ export default function StartButton() {
       {showPopup && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg text-center">
-            <h2 className="text-lg font-semibold mb-4">Select Duration (Prefer above "5s")</h2>
+            <h2 className="text-lg font-semibold mb-4">Select Duration (Prefer above 5s)</h2>
             <select
               value={duration}
               onChange={(e) => setDuration(Number(e.target.value))}

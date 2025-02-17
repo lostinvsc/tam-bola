@@ -14,7 +14,6 @@ const generateTambolaTicket = () => {
 
     for (let col = 0; col < 9; col++) {
         const min = col * 10 + 1;
-        const max = col === 8 ? 90 : min + 9;
         columns[col] = Array.from({ length: 10 }, (_, i) => min + i);
     }
 
